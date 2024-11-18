@@ -2,7 +2,7 @@
 
 
 cd BACKEND
-source BACKEND/backend_start.sh
+source init.sh
 
 cd ../FRONTEND
 npm install
