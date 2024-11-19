@@ -48,11 +48,26 @@ const AudioInterface = () => {
           </Card>
         )}
         
-        {response.message && (
-          <Alert>
-            <AlertDescription>{response.message}</AlertDescription>
-          </Alert>
-        )}
+        <Card>
+          <CardHeader>
+            <CardTitle>Additional Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <dl className="grid grid-cols-2 gap-4">
+              {Object.entries(response).map(([key, value]) => {
+                if (key !== 'transcription' && key !== 'lemur_resp') {
+                  return (
+                    <React.Fragment key={key}>
+                      <dt className="font-semibold">{key}</dt>
+                      <dd>{JSON.stringify(value)}</dd>
+                    </React.Fragment>
+                  );
+                }
+                return null;
+              })}
+            </dl>
+          </CardContent>
+        </Card>
       </div>
     );
   };
