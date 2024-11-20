@@ -12,13 +12,13 @@ This project needs:
 ## Idea of the project.
 I created a simple website where you can get tips on how to better your public speaking.
 
-![alt text](images/image.png)
+![alt text](images/Interface.png)
 
-You have two choices, either upload an audio clip or record something on the spot. 
+You have two choices, either upload an audio clip or record something on the spot. When you have created the samples you want transcribed and to get tips on, you can upload the file. Then the program will give you tips on how to make the speech better, and give you a list of filler words that you should avoid.
 
-![alt text](images/recording.png)
+![alt text](images/Audio_Analysis.png)
 
-When you have created the samples you want transcribed and to get tips on, you can upload the file. Then the program will give you tips on how to make the speech better, and give you a list of filler words that you should avoid.
+
 
 ## How to run
 
