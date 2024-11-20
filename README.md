@@ -2,6 +2,13 @@
 
 This is my submission for [Dev.to and AssemblyAI Challenge](https://dev.to/devteam/join-us-for-the-assemblyai-challenge-and-capture-the-nuance-of-human-speech-3000-in-prizes-4g4f?bb=189417).
 
+## Technical limitations
+This project needs:
+- Python 3.8 or higher
+- Node.js and npm
+- ffmpeg (will be installed by the script if possible)
+
+
 ## Idea of the project.
 I created a simple website where you can get tips on how to better your public speaking.
 
