@@ -2,7 +2,7 @@
 
 This is my submission for [Dev.to and AssemblyAI Challenge](https://dev.to/devteam/join-us-for-the-assemblyai-challenge-and-capture-the-nuance-of-human-speech-3000-in-prizes-4g4f?bb=189417).
 
-## Technical limitations
+## Technical requirements
 This project needs:
 - Python 3.8 or higher
 - Node.js and npm
