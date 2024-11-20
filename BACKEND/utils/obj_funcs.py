@@ -33,3 +33,5 @@ def get_words_per_minute(transcript: aai.Transcript, filepath) -> int:
 
     words_per_minute = int((word_count / duration) * seconds_in_minute)
     return words_per_minute
+
+
