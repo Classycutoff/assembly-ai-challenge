@@ -17,9 +17,8 @@ When you have created the samples you want transcribed and to get tips on, you c
 
 1. Run the `initialize_env.sh` script. It will surprisingly initialize the environment with downloading everything needed for Back- and Frontend.
 2. Open a terminal session, with the possibility of splitting sessions/windows.
-3. `cd BACKEND`.
+3. `cd BACKEND`
 4. `./start.sh`
 5. Split the terminal window, or open a new session.
 6. `cd FRONTEND`
-7. `npm run dev``
-
+7. `npm run dev`
