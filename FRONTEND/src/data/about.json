@@ -1,0 +1,19 @@
+{
+  "title": "About Speech Analyzer",
+  "contact": {
+    "name": "Eliel Taskinen",
+    "email": "1z4qvotb5@mozmail.com",
+    "github": "https://github.com/Classycutoff",
+    "linkedin": "https://www.linkedin.com/in/eliel-taskinen/"
+  },
+  "description": {
+    "main": "Speech Analyzer is an advanced tool designed to help improve public speaking skills. It analyzes audio samples to provide insights on speech patterns, filler words, and speaking rate. This project was created for the AssemblyAI Hackathon Challenge, aiming to capture the nuances of human speech and provide valuable insights.",
+    "challenge": "This Speech Analyzer is a project created for the AssemblyAI Hackathon Challenge. You can find more information about the challenge <a href='https://dev.to/devteam/join-us-for-the-assemblyai-challenge-and-capture-the-nuance-of-human-speech-3000-in-prizes-4g4f?bb=189416' target='_blank' rel='noopener noreferrer'>here</a>.",
+    "features": [
+      "Real-time speech analysis",
+      "Detailed feedback on filler words",
+      "Speaking rate calculation",
+      "Transcription of spoken content"
+    ]
+  }
+}

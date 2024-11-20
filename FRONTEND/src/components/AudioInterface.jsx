@@ -1,33 +1,54 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Upload, Mic, StopCircle, AlertCircle } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const AudioInterface = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [uploadResult, setUploadResult] = useState(null);
   const [recordResult, setRecordResult] = useState(null);
   const [error, setError] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   
   const visualizerRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioStreamRef = useRef(null);
   const audioChunks = useRef([]);
+
+  const challengeInfo = (
+    <div className="mb-8 p-4 bg-blue-100 dark:bg-blue-900 rounded-lg">
+      <h2 className="text-xl font-semibold mb-2">AssemblyAI Hackathon Project</h2>
+      <p>
+        This Speech Analyzer is a project created for the{" "}
+        <a 
+          href="https://dev.to/devteam/join-us-for-the-assemblyai-challenge-and-capture-the-nuance-of-human-speech-3000-in-prizes-4g4f?bb=189416" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-blue-600 dark:text-blue-400 hover:underline"
+        >
+          AssemblyAI Hackathon Challenge
+        </a>
+        . It aims to capture the nuances of human speech and provide valuable insights.
+      </p>
+    </div>
+  );
   
   const renderResponse = (response) => {
     if (!response) return null;
     
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 animate-slide-in">
         {response.transcription && (
           <Card>
             <CardHeader>
               <CardTitle>Transcription</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-700">{response.transcription}</p>
+              <p className="text-sm">{response.transcription}</p>
             </CardContent>
           </Card>
         )}
@@ -39,7 +60,7 @@ const AudioInterface = () => {
             </CardHeader>
             <CardContent>
               <div 
-                className="prose max-w-none"
+                className="prose max-w-none dark:prose-invert"
                 dangerouslySetInnerHTML={{ 
                   __html: response.lemur_resp.replace(/\n/g, '<br>')
                 }} 
@@ -92,10 +113,10 @@ const AudioInterface = () => {
       requestAnimationFrame(draw);
       analyzer.getByteTimeDomainData(dataArray);
       
-      canvasCtx.fillStyle = 'rgb(243, 244, 246)';
+      canvasCtx.fillStyle = 'rgba(200, 200, 200, 0.2)';
       canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
       canvasCtx.lineWidth = 2;
-      canvasCtx.strokeStyle = 'rgb(59, 130, 246)';
+      canvasCtx.strokeStyle = 'rgb(0, 125, 255)';
       canvasCtx.beginPath();
       
       const sliceWidth = canvas.width * 1.0 / bufferLength;
@@ -120,16 +141,20 @@ const AudioInterface = () => {
     draw();
   };
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+  };
+
   const handleFileUpload = async (event) => {
     event.preventDefault();
-    const fileInput = event.target.elements.file;
-    if (!fileInput.files[0]) return;
+    if (!selectedFile) return;
     
     setIsUploading(true);
     setError(null);
     
     const formData = new FormData();
-    formData.append('file', fileInput.files[0]);
+    formData.append('file', selectedFile);
     
     try {
       const response = await fetch('http://127.0.0.1:5000/upload', {
@@ -137,12 +162,15 @@ const AudioInterface = () => {
         body: formData,
         credentials: 'include'
       });
+      setIsUploading(false);
+      setIsAnalyzing(true);
       const result = await response.json();
       setUploadResult(result);
     } catch (err) {
       setError(err.message);
     } finally {
       setIsUploading(false);
+      setIsAnalyzing(false);
     }
   };
 
@@ -177,6 +205,7 @@ const AudioInterface = () => {
     
     mediaRecorderRef.current.stop();
     setIsRecording(false);
+    setIsAnalyzing(true);
     
     const audioBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
     
@@ -197,73 +226,126 @@ const AudioInterface = () => {
       setError(err.message);
     } finally {
       audioStreamRef.current?.getTracks().forEach(track => track.stop());
+      setIsAnalyzing(false);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
-      <h1 className="text-3xl font-bold">Audio Analysis Interface</h1>
+    <div className="space-y-8 animate-fade-in">
+      <h2 className="text-3xl font-bold tracking-tight">Audio Analysis Interface</h2>
       
-      <Card>
-        <CardHeader>
-          <CardTitle>Upload Audio File</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleFileUpload} className="space-y-4">
-            <input
-              type="file"
-              name="file"
-              accept=".mp3,.wav"
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            />
-            <Button type="submit" disabled={isUploading}>
-              {isUploading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Uploading...
-                </>
-              ) : (
-                'Upload'
+      {challengeInfo}
+      
+      <Tabs defaultValue="upload" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="upload">Upload Audio</TabsTrigger>
+          <TabsTrigger value="record">Record Audio</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="upload">
+          <Card>
+            <CardHeader>
+              <CardTitle>Upload Audio File</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleFileUpload} className="space-y-4">
+                <div className="flex items-center justify-center w-full">
+                  <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600 transition-colors duration-200">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <Upload className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" />
+                      <p className="mb-2 text-sm text-gray-500 dark:text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">MP3 or WAV (MAX. 10MB)</p>
+                    </div>
+                    <input id="dropzone-file" type="file" name="file" accept=".mp3,.wav" className="hidden" onChange={handleFileChange} />
+                  </label>
+                </div>
+                {selectedFile && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Selected file: {selectedFile.name}
+                  </p>
+                )}
+                <Button type="submit" disabled={isUploading || isAnalyzing || !selectedFile}>
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Uploading...
+                    </>
+                  ) : isAnalyzing ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    'Analyze'
+                  )}
+                </Button>
+              </form>
+              {(isUploading || isAnalyzing) && (
+                <div className="mt-4 text-center">
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+                  <p className="mt-2">{isUploading ? 'Uploading...' : 'Analyzing your audio...'}</p>
+                </div>
               )}
-            </Button>
-          </form>
-          {uploadResult && renderResponse(uploadResult)}
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle>Record Audio</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <canvas 
-            ref={visualizerRef} 
-            className="w-full h-16 bg-gray-100 rounded-md"
-          />
-          
-          <div className="space-x-4">
-            <Button
-              onClick={startRecording}
-              disabled={isRecording}
-              className={isRecording ? 'bg-red-600' : ''}
-            >
-              {isRecording ? 'Recording...' : 'Start Recording'}
-            </Button>
-            
-            <Button
-              onClick={stopRecording}
-              disabled={!isRecording}
-            >
-              Stop Recording
-            </Button>
-          </div>
-          
-          {recordResult && renderResponse(recordResult)}
-        </CardContent>
-      </Card>
+              {uploadResult && renderResponse(uploadResult)}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="record">
+          <Card>
+            <CardHeader>
+              <CardTitle>Record Audio</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <canvas 
+                ref={visualizerRef} 
+                className="w-full h-32 bg-gray-100 dark:bg-gray-800 rounded-md"
+              />
+              
+              <div className="flex justify-center space-x-4">
+                <Button
+                  onClick={startRecording}
+                  disabled={isRecording || isAnalyzing}
+                  className={isRecording ? 'bg-red-600 hover:bg-red-700' : ''}
+                >
+                  {isRecording ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Recording...
+                    </>
+                  ) : (
+                    <>
+                      <Mic className="mr-2 h-4 w-4" />
+                      Start Recording
+                    </>
+                  )}
+                </Button>
+                
+                <Button
+                  onClick={stopRecording}
+                  disabled={!isRecording || isAnalyzing}
+                >
+                  <StopCircle className="mr-2 h-4 w-4" />
+                  Stop Recording
+                </Button>
+              </div>
+              
+              {isAnalyzing && (
+                <div className="text-center">
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+                  <p className="mt-2">Analyzing your speech...</p>
+                </div>
+              )}
+              
+              {recordResult && renderResponse(recordResult)}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
       
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="animate-slide-in">
+          <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
