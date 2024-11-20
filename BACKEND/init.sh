@@ -44,7 +44,8 @@ fi
 # Check if ASSEMBLY_API is set in .env
 if ! grep -q "^ASSEMBLY_API=\".*\"$\|^ASSEMBLY_API='.*'$" .env; then
     echo -n "Please enter your Assembly AI API key:"
-    read api_key
+    read -s api_key  # -s flag hides the input
+    echo
     echo "ASSEMBLY_API=\"$api_key\"" >> .env
     echo "API key has been added to .env"
 fi
