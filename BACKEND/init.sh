@@ -1,9 +1,5 @@
 #!/bin/bash
 
-echo "Please add your Assembly AI API key to the .env file. This file won't be added to the git repo."
-
-
-
 # Create and activate virtual environment
 python3 -m venv venv
 source venv/bin/activate
@@ -47,7 +43,7 @@ fi
 
 # Check if ASSEMBLY_API is set in .env
 if ! grep -q "^ASSEMBLY_API=\".*\"$\|^ASSEMBLY_API='.*'$" .env; then
-    echo "Please enter your Assembly AI API key:"
+    echo -n "Please enter your Assembly AI API key:"
     read api_key
     echo "ASSEMBLY_API=\"$api_key\"" >> .env
     echo "API key has been added to .env"
